@@ -6,15 +6,18 @@ package calculodeareas;
 
 import java.util.Scanner;
 
-// Clase abstracta que representa una figura geométrica genérica
-abstract class Figura {
-    // Método abstracto que cada subclase debe implementar obligatoriamente
+/**
+ * Clase abstracta que representa una figura geométrica genérica.
+ */
+abstract class FiguraGeometrica {
     public abstract double calcularArea();
 }
 
-// Clase Cuadrado que hereda de Figura
-class Cuadrado extends Figura {
-    private double lado;
+/**
+ * Representa un cuadrado.
+ */
+class Cuadrado extends FiguraGeometrica {
+    private final double lado;
 
     public Cuadrado(double lado) {
         this.lado = lado;
@@ -22,13 +25,15 @@ class Cuadrado extends Figura {
 
     @Override
     public double calcularArea() {
-        return lado * lado;
+        return Math.pow(lado, 2);
     }
 }
 
-// Clase Círculo que hereda de Figura
-class Circulo extends Figura {
-    private double radio;
+/**
+ * Representa un círculo.
+ */
+class Circulo extends FiguraGeometrica {
+    private final double radio;
 
     public Circulo(double radio) {
         this.radio = radio;
@@ -40,10 +45,12 @@ class Circulo extends Figura {
     }
 }
 
-// Clase Triángulo que hereda de Figura
-class Triangulo extends Figura {
-    private double base;
-    private double altura;
+/**
+ * Representa un triángulo.
+ */
+class Triangulo extends FiguraGeometrica {
+    private final double base;
+    private final double altura;
 
     public Triangulo(double base, double altura) {
         this.base = base;
@@ -56,54 +63,85 @@ class Triangulo extends Figura {
     }
 }
 
-// Clase principal con el nombre solicitado
+/**
+ * Clase principal encargada de la ejecución del programa calculodeareas.
+ */
 public class Calculodeareas {
+    private static final Scanner LECTOR = new Scanner(System.in);
+
     public static void main(String[] args) {
-        Scanner scanner = new Scanner(System.in);
-        int opcion;
+        ejecutarAplicacion();
+        LECTOR.close();
+    }
+
+    /**
+     * Controla el flujo principal del programa y el menú de usuario.
+     */
+    private static void ejecutarAplicacion() {
+        int opcionSeleccionada;
 
         do {
-            System.out.println("\n=== CALCULADORA DE ÁREAS (calculodeareas) ===");
-            System.out.println("1. Cuadrado");
-            System.out.println("2. Círculo");
-            System.out.println("3. Triángulo");
-            System.out.println("4. Salir");
-            System.out.print("Elija una opción: ");
-            
-            opcion = scanner.nextInt();
-            Figura figura = null;
+            mostrarMenu();
+            opcionSeleccionada = LECTOR.nextInt();
 
-            switch (opcion) {
-                case 1:
-                    System.out.print("Ingrese el lado del cuadrado: ");
-                    double lado = scanner.nextDouble();
-                    figura = new Cuadrado(lado);
-                    break;
-                case 2:
-                    System.out.print("Ingrese el radio del círculo: ");
-                    double radio = scanner.nextDouble();
-                    figura = new Circulo(radio);
-                    break;
-                case 3:
-                    System.out.print("Ingrese la base del triángulo: ");
-                    double base = scanner.nextDouble();
-                    System.out.print("Ingrese la altura del triángulo: ");
-                    double altura = scanner.nextDouble();
-                    figura = new Triangulo(base, altura);
-                    break;
-                case 4:
-                    System.out.println("¡Gracias por usar el programa!");
-                    continue;
-                default:
-                    System.out.println("Opción no válida. Intente nuevamente.");
-                    continue;
+            if (opcionSeleccionada == 4) {
+                System.out.println("¡Gracias por usar calculodeareas!");
+                break;
             }
 
-            // Aplicación de polimorfismo: se llama al método calcularArea() según la figura seleccionada
-            System.out.println("El área calculada es: " + figura.calcularArea());
+            procesarOpcion(opcionSeleccionada);
 
-        } while (opcion != 4);
+        } while (true);
+    }
 
-        scanner.close();
+    /**
+     * Muestra las opciones disponibles en la consola.
+     */
+    private static void mostrarMenu() {
+        System.out.println("\n=== CALCULADORA DE ÁREAS (calculodeareas) ===");
+        System.out.println("1. Cuadrado");
+        System.out.println("2. Círculo");
+        System.out.println("3. Triángulo");
+        System.out.println("4. Salir");
+        System.out.print("Elija una opción: ");
+    }
+
+    /**
+     * Procesa la selección del usuario y muestra el resultado.
+     */
+    private static void procesarOpcion(int opcion) {
+        FiguraGeometrica figura = crearFigura(opcion);
+
+        if (figura != null) {
+            System.out.printf("El área calculada es: %.2f%n", figura.calcularArea());
+        } else {
+            System.out.println("Opción no válida. Intente nuevamente.");
+        }
+    }
+
+    /**
+     * Fábrica simple para instanciar figuras geométricas según la opción del usuario.
+     */
+    private static FiguraGeometrica crearFigura(int opcion) {
+        switch (opcion) {
+            case 1:
+                return new Cuadrado(solicitarMedida("Ingrese el lado del cuadrado: "));
+            case 2:
+                return new Circulo(solicitarMedida("Ingrese el radio del círculo: "));
+            case 3:
+                double base = solicitarMedida("Ingrese la base del triángulo: ");
+                double altura = solicitarMedida("Ingrese la altura del triángulo: ");
+                return new Triangulo(base, altura);
+            default:
+                return null;
+        }
+    }
+
+    /**
+     * Método auxiliar para evitar duplicación al solicitar valores numéricos por consola.
+     */
+    private static double solicitarMedida(String mensaje) {
+        System.out.print(mensaje);
+        return LECTOR.nextDouble();
     }
 }
